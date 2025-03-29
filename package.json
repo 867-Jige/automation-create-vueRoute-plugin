@@ -1,0 +1,32 @@
+{
+  "name": "automation-create-vueroute-plugin",
+  "version": "1.0.0",
+  "description": "这是一个可根据特定文件目录结构自动创建导航菜单和页面路由的插件",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "bulid": "vite build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/867-Jige/automation-create-vueRoute-plugin.git"
+  },
+  "keywords": [
+    "auto-vue-router",
+    "vue-router",
+    "自动创建路由",
+    "自动创建菜单",
+    "vue-router-plugin"
+  ],
+  "author": "867-Jige",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/867-Jige/automation-create-vueRoute-plugin/issues"
+  },
+  "homepage": "https://github.com/867-Jige/automation-create-vueRoute-plugin#readme",
+  "devDependencies": {
+    "@types/node": "^22.13.14",
+    "typescript": "^5.8.2",
+    "vite": "^6.2.3"
+  }
+}
