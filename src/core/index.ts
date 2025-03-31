@@ -1,32 +1,43 @@
-import { readPageModles, readPageConfigModles } from "../utils/file-operation";
 import { getDirNameArray } from "../utils/index";
 import {
   T_AutomationCreateVueroutePlugin_options,
   T_pagesConfig,
   T_breadcrumbList,
+  T_meun,
+  T_setMeun,
+  T_false,
+  T_route,
+  T_setRoute,
+  T_setBreadcrumb,
+  T_modules,
 } from "../types";
 export default class AutomationCreateVueroutePlugin {
-  routes: Array<{ [key: string]: any }>;
-  meuns: [];
-  private _modles: { [key: string]: any };
+  routes: Array<T_route>;
+  meuns: Array<T_meun>;
+  private modules: T_modules;
   private _pagesConfig: T_pagesConfig;
-  private _setRoute: Function | undefined;
-  private _setBreadcrumb: Function | undefined;
-  private _setMeun: Function | undefined;
-  constructor(options: T_AutomationCreateVueroutePlugin_options) {
+  private _setRoute: T_setRoute | undefined;
+  private _setBreadcrumb: T_setBreadcrumb | undefined;
+  private _setMeun: T_setMeun | undefined;
+  constructor(
+    options: T_AutomationCreateVueroutePlugin_options = {
+      modules: {},
+      pagesConfig: { title: "" },
+    }
+  ) {
     this.routes = [];
     this.meuns = [];
-    this._modles = readPageModles();
-    this._pagesConfig = readPageConfigModles();
+    this.modules = options.modules;
+    this._pagesConfig = options.pagesConfig || { title: "" };
     this._setRoute = options.setRoute;
     this._setBreadcrumb = options.setBreadcrumb;
     this._setMeun = options.setMeun;
     this.ergodicModules();
   }
   private ergodicModules() {
-    Object.keys(this._modles).forEach((key) => {
+    Object.keys(this.modules).forEach((key) => {
       const paths = getDirNameArray(key);
-      const component = this._modles[key].default;
+      const component = this.modules[key].default;
       let meuns = this.meuns;
       const leng = paths.length;
       const breadcrumbList: T_breadcrumbList = [];
@@ -34,23 +45,25 @@ export default class AutomationCreateVueroutePlugin {
         const lastOne = index === leng - 1;
         let config = this._pagesConfig[dirName] || {};
         this.setBreadcrumb(breadcrumbList, dirName, config);
-        meuns = this.setMeuns(meuns, dirName, config, lastOne);
+        if (Array.isArray(meuns)) {
+          meuns = this.setMeuns(meuns, dirName, config, lastOne);
+        }
         if (lastOne) {
           this.setRouter(dirName, component, { ...config, breadcrumbList });
         }
       });
     });
-    console.log(this.routes);
-    console.log(this.meuns);
   }
   //   生成路由菜单
   private setMeuns(
-    meuns: Array<{ [key: string]: any }>,
+    meuns: Array<T_meun>,
     dirName: string,
     config: T_pagesConfig,
     lastOne: boolean
   ) {
-    let meun = meuns.find((item) => item.path === `/${dirName}`);
+    let meun: T_meun | T_false = meuns.find(
+      (item) => item.path === `/${dirName}`
+    );
     const { title = dirName } = config;
     if (!meun) {
       meun = {
@@ -58,10 +71,14 @@ export default class AutomationCreateVueroutePlugin {
         title,
       };
       if (this._setMeun) {
-        this._setMeun(meun, config);
+        meun = this._setMeun(meun, config);
       }
-      meuns.push(meun);
-      meuns.sort((a, b) => b.sort - a.sort);
+      if (meun) {
+        meuns.push(meun);
+        meuns.sort((a, b) => b.sort - a.sort);
+      } else {
+        return false;
+      }
     }
     if (!lastOne && !meun.children) {
       meun.children = [];
@@ -74,25 +91,24 @@ export default class AutomationCreateVueroutePlugin {
     parentDirName: string,
     config: T_pagesConfig
   ) {
-    const breadcrumb = {
+    let breadcrumb: T_meun | T_false = {
       path: `/${parentDirName}`,
       title: config.title || parentDirName,
     };
     if (this._setBreadcrumb) {
-      this._setBreadcrumb(breadcrumb, config);
+      breadcrumb = this._setBreadcrumb(breadcrumb, config);
     }
-    breadcrumbList.push(breadcrumb);
+    if (breadcrumb) {
+      breadcrumbList.push(breadcrumb);
+    }
   }
   //  生成路由信息
   private setRouter(
     parentDirName: string,
-    component: {
-      default: object;
-      [key: string]: any;
-    },
+    component: object,
     config: T_pagesConfig
   ) {
-    const route = {
+    let route: T_route | T_false = {
       component,
       path: `/${parentDirName}`,
       name: parentDirName,
@@ -101,8 +117,10 @@ export default class AutomationCreateVueroutePlugin {
       },
     };
     if (this._setRoute) {
-      this._setRoute(route, config);
+      route = this._setRoute(route, config);
     }
-    this.routes.push(route);
+    if (route) {
+      this.routes.push(route);
+    }
   }
 }

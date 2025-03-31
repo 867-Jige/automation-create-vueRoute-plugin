@@ -1,6 +1,6 @@
 {
-  "name": "automation-create-vueroute-plugin",
-  "version": "1.0.0",
+  "name": "automation-create-vue-route-plugin",
+  "version": "2.0.0",
   "description": "这是一个可根据特定文件目录结构自动创建导航菜单和页面路由的插件",
   "main": "index.ts",
   "scripts": {
