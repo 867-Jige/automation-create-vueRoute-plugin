@@ -44,6 +44,8 @@ npm install automation-create-vue-route-plugin --save-dev
 ```
 2. Use the plugin:  
 ```javascript
+import { createApp } from 'vue'
+const app = createApp(App)
 // Import the plugin
 import automationCreateVueroutePlugin from "automation-create-vue-route-plugin";
 
@@ -147,4 +149,6 @@ app.use(automationCreateVueroutePlugin, {
     return route;
   },
 });
+
+app.mount('#app')
 ```

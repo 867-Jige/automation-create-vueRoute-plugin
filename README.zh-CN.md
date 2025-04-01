@@ -50,6 +50,8 @@ npm install automation-create-vue-route-plugin --save-dev
 2.引用插件：
 
 ```javascript
+import { createApp } from 'vue'
+const app = createApp(App)
 // 引入插件
 import automationCreateVueroutePlugin from "automation-create-vue-route-plugin";
 
@@ -153,4 +155,5 @@ app.use(automationCreateVueroutePlugin, {
     return route;
   },
 });
+app.mount('#app')
 ```
