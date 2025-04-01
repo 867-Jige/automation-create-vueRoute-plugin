@@ -1,8 +1,9 @@
 {
   "name": "automation-create-vue-route-plugin",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "这是一个可根据特定文件目录结构自动创建导航菜单和页面路由的插件",
-  "main": "index.ts",
+  "main": "dist/index.umd.js",
+  "module": "dist/index.es.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "bulid": "vite build"
@@ -14,6 +15,7 @@
   "keywords": [
     "auto-vue-router",
     "vue-router",
+    "automation-create-vue-route-plugin",
     "自动创建路由",
     "自动创建菜单",
     "vue-router-plugin"

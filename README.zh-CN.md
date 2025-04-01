@@ -1,4 +1,4 @@
-🌐 **Language**: [中文版文档](README.zh-CN.md) | [English Version](README.md)
+🌐 **Language**: [English Version](README.md) | [中文版文档](README.zh-CN.md)
 
 # automation-create-vueRoute-plugin
 
