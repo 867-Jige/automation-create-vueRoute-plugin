@@ -1,6 +1,11 @@
 {
   "name": "automation-create-vue-route-plugin",
-  "version": "2.1.0",
+  "version": "2.1.1",
+  "files": [
+    "dist",
+    "README.md",
+    "README.zh-CN.md"
+  ],
   "description": "这是一个可根据特定文件目录结构自动创建导航菜单和页面路由的插件",
   "main": "dist/index.umd.js",
   "module": "dist/index.es.js",
