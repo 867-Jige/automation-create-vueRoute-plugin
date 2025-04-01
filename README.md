@@ -52,9 +52,9 @@ app.use(automationCreateVueroutePlugin, {
   /**
    * type: object
    * File modules for each page. Requirements:
-   * 1. The key is the route name of the page, and the value is the file module of the page.
-   * 2. The file module of the page must be an `index.vue` file.
-   * 3. The key must start with `src/pages/`.
+   * 1. key is the route name, value is the file module
+   * 2. File module must be index.vue
+   * 3. key must start with src/pages/
    */
   modules: {
     "src/pages/user/userList/index.vue": {
@@ -63,10 +63,10 @@ app.use(automationCreateVueroutePlugin, {
   },
   /**
    * type: object
-   * Configuration information for each page. Requirements:
-   * 1. The key is the parent directory name of the `index.vue` file, and the value is the configuration information of the page.
-   * 2. The configuration information must be an object.
-   * 3. The configuration information must include a `title`.
+   * Configuration for each page. Requirements:
+   * 1. key is the parent directory name of index.vue, value is page configuration
+   * 2. Configuration must be an object
+   * 3. Configuration must include title
    */
   pagesConfig: {
     user: {
@@ -89,32 +89,48 @@ app.use(automationCreateVueroutePlugin, {
   /**
    * type: function
    *
-   * Callback function for setting the navigation menu. Requirements:
-   * 1. The parameter `meun` is the navigation menu object, containing `path` and `title` properties.
-   * 2. The parameter `config` is the configuration information object of the page.
-   * 3. The return value must be the navigation menu object. If `null` is returned, the menu will not be added to the navigation.
+   * Callback for setting navigation menu. Requirements:
+   * 1. Parameter 'menu' is menu object containing path, title
+   * 2. Parameter 'config' is page configuration object
+   * 3. Must return menu object, null will exclude from menu
    */
   setMeun: (meun, config) => {
-    // You can set the properties of the navigation menu based on the page configuration.
+    // You can set menu properties based on page config
+    meun.sort = 1; // You can set menu sorting
     meun.meta = {
       ...meun.meta,
       ...config,
-      sort: 1, // You can also set the sorting of the navigation menu.
     };
     return meun;
   },
   /**
+   *
    * type: function
    *
-   * Callback function for setting the route. Requirements:
-   * 1. The parameter `route` is the route object, containing `path`, `name`, and `meta` properties.
-   * 2. The parameter `config` is the configuration information object of the page.
-   * 3. The return value must be the route object. If `null` is returned, the route will not be added to the router.
+   * Callback for setting breadcrumbs. Requirements:
+   * 1. Parameter 'route' is route object containing path, title
+   * 2. Parameter 'config' is page configuration object
+   * 3. Must return route object, null will exclude from breadcrumbs
+   * */
+  setBreadcrumb: (route, config) => {
+    // You can set breadcrumb properties based on page config
+    route.meta = {
+      ...config,
+    };
+    return route;
+  },
+  /**
+   * type: function
+   *
+   * Callback for setting routes. Requirements:
+   * 1. Parameter 'route' is route object containing path, name, meta
+   * 2. Parameter 'config' is page configuration object
+   * 3. Must return route object, null will exclude from routes
    */
   setRoute: (route, config) => {
-    // You can set the properties of the route based on the page configuration.
+    // You can set route properties based on page config
     /**
-     * The `config` includes breadcrumb configuration:
+     * config contains breadcrumb configuration:
      * {
      *  component,
      *  path,
@@ -123,10 +139,10 @@ app.use(automationCreateVueroutePlugin, {
      *      breadcrumbList:[],
      *  },
      * }
-     * 
+     *
      * */
     route.meta = {
-      ...route.meta,
+      ...config,
     };
     return route;
   },

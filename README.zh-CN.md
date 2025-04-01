@@ -102,12 +102,28 @@ app.use(automationCreateVueroutePlugin, {
    */
   setMeun: (meun, config) => {
     // 你可以根据页面配置信息来设置导航菜单的属性
+    meun.sort = 1; //你有可以以设置导航菜单的排序
     meun.meta = {
       ...meun.meta,
       ...config,
-      sort: 1, //你有可以以设置导航菜单的排序
     };
     return meun;
+  },
+  /**
+   *
+   * type: function
+   *
+   * 设置面包屑的回调函数，要求：
+   * 1. 参数 route 为路由对象，包含 path、title 属性
+   * 2. 参数 config 为页面的配置信息对象
+   * 3. 返回值必须为路由对象，若返回值为 null，则该路由不会被添加到面包屑中
+   * */
+  setBreadcrumb: (route, config) => {
+    // 你可以根据页面配置信息来设置面包屑的属性
+    route.meta = {
+      ...config,
+    };
+    return route;
   },
   /**
    * type: function
@@ -129,10 +145,10 @@ app.use(automationCreateVueroutePlugin, {
      *      breadcrumbList:[],
      *  },
      * }
-     * 
+     *
      * */
     route.meta = {
-      ...route.meta,
+      ...config,
     };
     return route;
   },
