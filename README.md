@@ -37,118 +37,129 @@ Introduction: This is a plugin that automatically generates navigation menus and
     }
 }
 ```
-1. Now that you understand the rules, let's start using the plugin!
-Install the plugin:  
-```shell
+#### Now that you understand the rules, let's start using the plugin!
+1. Install the Plugin:
+````shell
 npm install automation-create-vue-route-plugin --save-dev
-```
-2. Use the plugin:  
-```javascript
-import { createApp } from 'vue'
-const app = createApp(App)
-// Import the plugin
+````
+2. Create an auto-router.ts (or .js) File:
+````javascript
 import automationCreateVueroutePlugin from "automation-create-vue-route-plugin";
 
-// Use the plugin
-app.use(automationCreateVueroutePlugin, {
-  /**
-   * type: object
-   * File modules for each page. Requirements:
-   * 1. key is the route name, value is the file module
-   * 2. File module must be index.vue
-   * 3. key must start with src/pages/
-   */
-  modules: {
-    "src/pages/user/userList/index.vue": {
-      default: () => import("src/pages/user/userList/index.vue"),
-    },
-  },
-  /**
-   * type: object
-   * Configuration for each page. Requirements:
-   * 1. key is the parent directory name of index.vue, value is page configuration
-   * 2. Configuration must be an object
-   * 3. Configuration must include title
-   */
-  pagesConfig: {
-    user: {
-      title: "User Management",
-      icon: "el-icon-user",
-    },
-    userList: {
-      title: "User List",
-      icon: "el-icon-user",
-    },
-    permission: {
-      title: "Permission Settings",
-      icon: "el-icon-setting",
-    },
-    role: {
-      title: "Role Management",
-      icon: "el-icon-s-custom",
-    },
-  },
-  /**
-   * type: function
-   *
-   * Callback for setting navigation menu. Requirements:
-   * 1. Parameter 'menu' is menu object containing path, title
-   * 2. Parameter 'config' is page configuration object
-   * 3. Must return menu object, null will exclude from menu
-   */
-  setMeun: (meun, config) => {
-    // You can set menu properties based on page config
-    meun.sort = 1; // You can set menu sorting
-    meun.meta = {
-      ...meun.meta,
-      ...config,
-    };
-    return meun;
-  },
-  /**
-   *
-   * type: function
-   *
-   * Callback for setting breadcrumbs. Requirements:
-   * 1. Parameter 'route' is route object containing path, title
-   * 2. Parameter 'config' is page configuration object
-   * 3. Must return route object, null will exclude from breadcrumbs
-   * */
-  setBreadcrumb: (route, config) => {
-    // You can set breadcrumb properties based on page config
-    route.meta = {
-      ...config,
-    };
-    return route;
-  },
-  /**
-   * type: function
-   *
-   * Callback for setting routes. Requirements:
-   * 1. Parameter 'route' is route object containing path, name, meta
-   * 2. Parameter 'config' is page configuration object
-   * 3. Must return route object, null will exclude from routes
-   */
-  setRoute: (route, config) => {
-    // You can set route properties based on page config
-    /**
-     * config contains breadcrumb configuration:
-     * {
-     *  component,
-     *  path,
-     *  name,
-     *  meta: {
-     *      breadcrumbList:[],
-     *  },
-     * }
-     *
-     * */
-    route.meta = {
-      ...config,
-    };
-    return route;
-  },
-});
+// For Vite projects: use import.meta.glob to import page modules
+const pageModles = import.meta.glob("@/pages/*/**/index.vue", { eager: true });
 
-app.mount('#app')
-```
+// Fallback for environments without import.meta.glob:
+// const pageModles = {
+//   "src/pages/user/userList/index.vue": {
+//     default: () => import("src/pages/user/userList/index.vue"),
+//   },
+// }
+
+// Import page configurations (Vite)
+import pagesConfig from "@/pages/index";
+
+export default {
+  install(app: any) {
+    app.use(automationCreateVueroutePlugin, {
+      /**
+       * type: object
+       * Page modules requirements:
+       * 1. Key = route name, Value = page module
+       * 2. Must use index.vue files
+       * 3. Key must start with "src/pages/"
+       */
+      modules: pageModles,
+
+      /**
+       * type: object
+       * Page configurations requirements:
+       * 1. Key = parent directory name of index.vue, Value = config
+       * 2. Config must be an object
+       * 3. Must include "title" in config
+       */
+      pagesConfig: {
+        user: {
+          title: "User Management",
+          icon: "el-icon-user",
+        },
+        userList: {
+          title: "User List",
+          icon: "el-icon-user",
+        },
+        permission: {
+          title: "Permission Settings",
+          icon: "el-icon-setting",
+        },
+        role: {
+          title: "Role Management",
+          icon: "el-icon-s-custom",
+        },
+      },
+
+      /**
+       * type: function
+       * Navigation menu configuration callback:
+       * 1. Param "meun": menu object (contains path/title)
+       * 2. Param "config": page config object
+       * 3. Return menu object (return null to exclude)
+       */
+      setMeun: (meun, config) => {
+        meun.sort = 1; // Set menu sorting
+        meun.meta = {
+          ...meun.meta,
+          ...config,
+        };
+        return meun;
+      },
+
+      /**
+       * type: function
+       * Breadcrumb configuration callback:
+       * 1. Param "route": route object (path/title)
+       * 2. Param "config": page config
+       * 3. Return route object (return null to exclude)
+       */
+      setBreadcrumb: (route, config) => {
+        route.meta = {
+          ...config,
+        };
+        return route;
+      },
+
+      /**
+       * type: function
+       * Route configuration callback:
+       * 1. Param "route": route object (path/name/meta)
+       * 2. Param "config": page config
+       * 3. Return route object (return null to exclude)
+       */
+      setRoute: (route, config) => {
+        route.meta = {
+          ...config,
+        };
+        return route;
+      },
+    });
+  },
+};
+````
+4. Use the Plugin:
+````javascript
+// In main.ts, import auto-router.ts
+import autoRouter from "./auto-router";
+
+// For Vue 2.x
+import Vue from "vue";
+Vue.use(autoRouter);
+// Access instance via Vue.prototype.$autRouteInstance
+console.log(Vue.prototype.$autRouteInstance);
+
+// For Vue 3.x
+import { createApp } from "vue";
+const app = createApp(App);
+app.use(autoRouter);
+// Access instance via app.config.globalProperties.$autRouteInstance
+console.log(app.config.globalProperties.$autRouteInstance);
+app.mount("#app");
+````

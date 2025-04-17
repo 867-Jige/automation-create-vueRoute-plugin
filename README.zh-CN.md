@@ -47,113 +47,139 @@
 npm install automation-create-vue-route-plugin --save-dev
 ```
 
-2.引用插件：
+2. 创建一个auto-router.ts（.js） 文件：
 
 ```javascript
-import { createApp } from 'vue'
-const app = createApp(App)
-// 引入插件
 import automationCreateVueroutePlugin from "automation-create-vue-route-plugin";
+// 使用vite时可以使用import.meta.glob导入页面模块
+const pageModles = import.meta.glob("@/pages/*/**/index.vue", { eager: true });
+// 不支持import.meta.glob时
+// const pageModles = {
+//   "src/pages/user/userList/index.vue": {
+//     default: () => import("src/pages/user/userList/index.vue"),
+//   },
+// }
+// 使用vite时可以使用import.meta.glob导入页面配置信息
+import pagesConfig from "@/pages/index";
+export default {
+  install(app: any) {
+    app.use(automationCreateVueroutePlugin, {
+      /**
+       * type: object
+       * 各个页面的文件模块，要求：
+       * 1. key 为页面的路由名，value 为页面的文件模块
+       * 2. 页面的文件模块必须为 index.vue 文件
+       * 3. key以src/pages/开头
+       */
+      modules: pageModles,
+      /**
+       * type: object
+       * 各个页面的配置信息，要求：
+       * 1. key 为页面index.vue的父目录名称，value 为页面的配置信息
+       * 2. 页面的配置信息必须为对象
+       * 3. 页面的配置信息中必须包含 title
+       */
+      pagesConfig: {
+        user: {
+          title: "用户管理",
+          icon: "el-icon-user",
+        },
+        userList: {
+          title: "用户列表",
+          icon: "el-icon-user",
+        },
+        permission: {
+          title: "权限设置",
+          icon: "el-icon-setting",
+        },
+        role: {
+          title: "角色管理",
+          icon: "el-icon-s-custom",
+        },
+      },
+      /**
+       * type: function
+       *
+       * 设置导航菜单的回调函数，要求：
+       * 1. 参数 meun 为导航菜单对象，包含 path、title 属性
+       * 2. 参数 config 为页面的配置信息对象
+       * 3. 返回值必须为导航菜单对象，若返回值为 null，则该导航菜单不会被添加到导航菜单中
+       */
+      setMeun: (meun, config) => {
+        // 你可以根据页面配置信息来设置导航菜单的属性
+        meun.sort = 1; //你有可以以设置导航菜单的排序
+        meun.meta = {
+          ...meun.meta,
+          ...config,
+        };
+        return meun;
+      },
+      /**
+       *
+       * type: function
+       *
+       * 设置面包屑的回调函数，要求：
+       * 1. 参数 route 为路由对象，包含 path、title 属性
+       * 2. 参数 config 为页面的配置信息对象
+       * 3. 返回值必须为路由对象，若返回值为 null，则该路由不会被添加到面包屑中
+       * */
+      setBreadcrumb: (route, config) => {
+        // 你可以根据页面配置信息来设置面包屑的属性
+        route.meta = {
+          ...config,
+        };
+        return route;
+      },
+      /**
+       * type: function
+       *
+       * 设置路由的回调函数，要求：
+       * 1. 参数 route 为路由对象，包含 path、name、meta 属性
+       * 2. 参数 config 为页面的配置信息对象
+       * 3. 返回值必须为路由对象，若返回值为 null，则该路由不会被添加到路由中
+       */
+      setRoute: (route, config) => {
+        // 你可以根据页面配置信息来设置路由的属性
+        /**
+         * config中会有面包屑的配置信息
+         * {
+         *  component,
+         *  path,
+         *  name,
+         *  meta: {
+         *      breadcrumbList:[],
+         *  },
+         * }
+         *
+         * */
+        route.meta = {
+          ...config,
+        };
+        return route;
+      },
+    });
+  },
+};
+```
 
-// 使用插件
-app.use(automationCreateVueroutePlugin, {
-  /**
-   * type: object
-   * 各个页面的文件模块，要求：
-   * 1. key 为页面的路由名，value 为页面的文件模块
-   * 2. 页面的文件模块必须为 index.vue 文件
-   * 3. key以src/pages/开头
-   */
-  modules: {
-    "src/pages/user/userList/index.vue": {
-      default: () => import("src/pages/user/userList/index.vue"),
-    },
-  },
-  /**
-   * type: object
-   * 各个页面的配置信息，要求：
-   * 1. key 为页面index.vue的父目录名称，value 为页面的配置信息
-   * 2. 页面的配置信息必须为对象
-   * 3. 页面的配置信息中必须包含 title
-   */
-  pagesConfig: {
-    user: {
-      title: "用户管理",
-      icon: "el-icon-user",
-    },
-    userList: {
-      title: "用户列表",
-      icon: "el-icon-user",
-    },
-    permission: {
-      title: "权限设置",
-      icon: "el-icon-setting",
-    },
-    role: {
-      title: "角色管理",
-      icon: "el-icon-s-custom",
-    },
-  },
-  /**
-   * type: function
-   *
-   * 设置导航菜单的回调函数，要求：
-   * 1. 参数 meun 为导航菜单对象，包含 path、title 属性
-   * 2. 参数 config 为页面的配置信息对象
-   * 3. 返回值必须为导航菜单对象，若返回值为 null，则该导航菜单不会被添加到导航菜单中
-   */
-  setMeun: (meun, config) => {
-    // 你可以根据页面配置信息来设置导航菜单的属性
-    meun.sort = 1; //你有可以以设置导航菜单的排序
-    meun.meta = {
-      ...meun.meta,
-      ...config,
-    };
-    return meun;
-  },
-  /**
-   *
-   * type: function
-   *
-   * 设置面包屑的回调函数，要求：
-   * 1. 参数 route 为路由对象，包含 path、title 属性
-   * 2. 参数 config 为页面的配置信息对象
-   * 3. 返回值必须为路由对象，若返回值为 null，则该路由不会被添加到面包屑中
-   * */
-  setBreadcrumb: (route, config) => {
-    // 你可以根据页面配置信息来设置面包屑的属性
-    route.meta = {
-      ...config,
-    };
-    return route;
-  },
-  /**
-   * type: function
-   *
-   * 设置路由的回调函数，要求：
-   * 1. 参数 route 为路由对象，包含 path、name、meta 属性
-   * 2. 参数 config 为页面的配置信息对象
-   * 3. 返回值必须为路由对象，若返回值为 null，则该路由不会被添加到路由中
-   */
-  setRoute: (route, config) => {
-    // 你可以根据页面配置信息来设置路由的属性
-    /**
-     * config中会有面包屑的配置信息
-     * {
-     *  component,
-     *  path,
-     *  name,
-     *  meta: {
-     *      breadcrumbList:[],
-     *  },
-     * }
-     *
-     * */
-    route.meta = {
-      ...config,
-    };
-    return route;
-  },
-});
-app.mount('#app')
+3. 使用插件：
+
+```javascript
+// 在main.ts中引入auto-router.ts
+import autoRouter from "./auto-router";
+
+// 在vue2.x中
+import Vue from "vue";
+Vue.use(autoRouter);
+// 在Vue.prototype.$autRouteInstance中获取实例
+console.log(Vue.prototype.$autRouteInstance);
+
+
+// 在vue3.x中
+import { createApp } from "vue";
+const app = createApp(App);
+app.use(autoRouter);
+// 在app.config.globalProperties.$autRouteInstance中获取实例
+console.log(app.config.globalProperties.$autRouteInstance);
+app.mount("#app");
 ```

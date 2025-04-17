@@ -1,6 +1,6 @@
 {
   "name": "automation-create-vue-route-plugin",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "files": [
     "dist",
     "README.md",
@@ -21,9 +21,9 @@
     "auto-vue-router",
     "vue-router",
     "automation-create-vue-route-plugin",
+    "vue-router-plugin",
     "自动创建路由",
-    "自动创建菜单",
-    "vue-router-plugin"
+    "自动创建菜单"
   ],
   "author": "867-Jige",
   "license": "ISC",
